@@ -29,13 +29,16 @@ const data = [
 ]
 
 const App = () => {
+  let selected
   return (
     <View style={{ flex: 1 }}>
       <Pager
         horizontal={true}
         width={width}
-        height={512}
-        initialIndex={3}
+        height={256}
+        onPageSelected={(index) => {
+          console.log(index)
+        }}
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}>
         {
@@ -44,7 +47,7 @@ const App = () => {
               <View
                 key={'key' + index}
                 style={{
-                  height: 512,
+                  height: 256,
                   width: width,
                   justifyContent: 'center',
                   alignItems: 'center',

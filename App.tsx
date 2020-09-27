@@ -32,7 +32,7 @@ const App = () => {
   return (
     <View style={{ flex: 1 }}>
       <Pager
-        horizontal={false}
+        horizontal={true}
         width={width}
         height={512}
         initialIndex={3}

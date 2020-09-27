@@ -1,6 +1,5 @@
 import React from 'react'
 import { View, Dimensions, StyleSheet, ScrollView } from 'react-native'
-import PropTypes from 'prop-types'
 
 const { width, height } = Dimensions.get('window')
 
@@ -20,6 +19,8 @@ class Pager extends React.Component<PagerProps, any>{
   isScrolling: boolean
 
   lastMotion: number
+  lastOffset: any
+
   selectedPage: number
 
   constructor(props) {
@@ -30,7 +31,7 @@ class Pager extends React.Component<PagerProps, any>{
     this.isScrolling = false
     this.selectedPage = this.state.initialIndex
     this.lastMotion = 0
-
+    this.lastOffset = {}
   }
 
   _initialState = () => {
@@ -47,7 +48,6 @@ class Pager extends React.Component<PagerProps, any>{
 
   componentDidMount() {
     //console.debug('componentDidMount')
-
   }
 
   componentWillUnmount() {
@@ -56,8 +56,6 @@ class Pager extends React.Component<PagerProps, any>{
   }
 
   componentDidUpdate(prevProps) {
-    console.debug('componentDidUpdate')
-
     if (this.props !== prevProps) {
       this.setState({ ...this.props }, () => {
         this.isScrolling = false
@@ -71,24 +69,20 @@ class Pager extends React.Component<PagerProps, any>{
 
   _onScroll = (e) => {
     //console.debug('_onScroll')
-    //console.log(e.nativeEvent.contentOffset)
   }
 
   _onScrollBeginDrag = (e) => {
-    this.isScrolling = true
     //console.debug('_onScrollBeginDrag')
-
-    //this.lastMotion = e.nativeEvent.contentOffset.
+    this.isScrolling = true
 
     this.lastMotion = this.state.horizontal ?
       e.nativeEvent.contentOffset.x : e.nativeEvent.contentOffset.y
   }
 
   _onScrollEndDrag = (e) => {
+    //console.debug('_onScrollEndDrag')
     this.isScrolling = false
 
-    //console.log(e.nativeEvent.contentOffset)
-    //console.log(this.state.horizontal)
     let motion = this.state.horizontal ?
       (e.nativeEvent.contentOffset.x - this.lastMotion)
       :
@@ -97,13 +91,8 @@ class Pager extends React.Component<PagerProps, any>{
     this._computePagerOffset(motion)
   }
 
-  _onMomentumScrollEnd = (e) => {
-    console.log('_onMomentumScrollEnd')
-  }
-
   _computePagerOffset = (motion) => {
-    //console.debug('_computePagerOffset')
-    //console.log(motion)
+    console.log(motion)
     let isPageChanged = false
     if (Math.abs(motion) > MIN_DISTANCE_FOR_FLING) {
       this.selectedPage = motion > 0 ?
@@ -114,18 +103,7 @@ class Pager extends React.Component<PagerProps, any>{
       isPageChanged = true
     }
 
-    let x = this.state.horizontal ? this.state.width * this.selectedPage : 0
-    let y = this.state.horizontal ? 0 : this.state.height * this.selectedPage
-
-    this.scrollViewRef.scrollTo({
-      x: x,
-      y: y,
-      animated: true
-    })
-
-    if (isPageChanged) {
-      this._onPageSelected(this.selectedPage)
-    }
+    this._scrollToIndex(this.selectedPage, true)
   }
 
   _scrollToIndex = (index, animated) => {
@@ -142,6 +120,12 @@ class Pager extends React.Component<PagerProps, any>{
     //console.debug('Selected Page: ', page)
   }
 
+  _onLayout = (event) => {
+    if (this.state.initialIndex !== 0) {
+      this._scrollToIndex(this.state.initialIndex, false)
+    }
+  }
+
   render() {
     return (
       <View style={[styles.container,
@@ -150,6 +134,7 @@ class Pager extends React.Component<PagerProps, any>{
         height: this.state.height
       }]}>
         <ScrollView
+          onLayout={this._onLayout}
           ref={ref => this.scrollViewRef = ref}
           {...this.props}
           onScroll={this._onScroll}

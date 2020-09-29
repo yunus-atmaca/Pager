@@ -20,12 +20,6 @@ const data = [
   {
     title: '5'
   },
-  {
-    title: '6'
-  },
-  {
-    title: '7'
-  },
 ]
 
 const App = () => {
@@ -33,6 +27,13 @@ const App = () => {
   return (
     <View style={{ flex: 1 }}>
       <Pager
+        tabs={[
+          'tab1',
+          'tab2',
+          'tab3',
+          'tab4',
+          'tab5',
+        ]}
         horizontal={true}
         width={width}
         height={256}

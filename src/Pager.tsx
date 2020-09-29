@@ -1,5 +1,12 @@
 import React from 'react'
-import { View, Dimensions, StyleSheet, ScrollView } from 'react-native'
+import {
+  View,
+  Dimensions,
+  StyleSheet,
+  ScrollView
+} from 'react-native'
+
+import Tabs from './Tabs'
 
 const { width, height } = Dimensions.get('window')
 
@@ -12,7 +19,8 @@ interface PagerProps {
   initialIndex?: number,
   showsHorizontalScrollIndicator?: boolean,
   showsVerticalScrollIndicator?: boolean,
-  onPageSelected?: Function
+  onPageSelected?: Function,
+  tabs?: Array<string>
 }
 
 class Pager extends React.Component<PagerProps, any>{
@@ -41,7 +49,9 @@ class Pager extends React.Component<PagerProps, any>{
       width: this.props.width || width,
       height: this.props.height || height,
       horizontal: this.props.horizontal,
-      initialIndex: this.props.initialIndex || 0
+      initialIndex: this.props.initialIndex || 0,
+      tabs: this.props.tabs || null,
+      selectedIndex: this.props.initialIndex || 0
     }
 
     return initialState
@@ -69,22 +79,37 @@ class Pager extends React.Component<PagerProps, any>{
   }
 
   _onMomentumScrollEnd = (e) => {
-    console.debug('_onMomentumScrollEnd')
-    if (this.state.horizontal) {
-      if (Math.floor(this.selectedOffset.x) === Math.floor(e.nativeEvent.contentOffset.x)) {
+    //console.debug('_onMomentumScrollEnd')
+    /*if (this.state.horizontal) {
+      if (Math.abs(this.selectedOffset.x - e.nativeEvent.contentOffset.x) < 2) {
         //console.log('Horizontal-Selected-Page: ')
+        this.setState({ selectedIndex: this.selectedPage })
         this.props.onPageSelected && this.props.onPageSelected(this.selectedPage)
       }
     } else {
-      if (Math.floor(this.selectedOffset.y) === Math.floor(e.nativeEvent.contentOffset.y)) {
+      if (Math.abs(this.selectedOffset.y - e.nativeEvent.contentOffset.y) < 2) {
         //console.log('Vertical-Selected-Page: ')
+        this.setState({ selectedIndex: this.selectedPage })
         this.props.onPageSelected && this.props.onPageSelected(this.selectedPage)
       }
-    }
+    }*/
   }
 
   _onScroll = (e) => {
     //console.debug('_onScroll')
+    if (this.state.horizontal) {
+      if (Math.abs(this.selectedOffset.x - e.nativeEvent.contentOffset.x) < 2) {
+        //console.log('Horizontal-Selected-Page: ')
+        this.setState({ selectedIndex: this.selectedPage })
+        this.props.onPageSelected && this.props.onPageSelected(this.selectedPage)
+      }
+    } else {
+      if (Math.abs(this.selectedOffset.y - e.nativeEvent.contentOffset.y) < 2) {
+        //console.log('Vertical-Selected-Page: ')
+        this.setState({ selectedIndex: this.selectedPage })
+        this.props.onPageSelected && this.props.onPageSelected(this.selectedPage)
+      }
+    }
   }
 
   _onScrollBeginDrag = (e) => {
@@ -143,12 +168,22 @@ class Pager extends React.Component<PagerProps, any>{
   }
 
   render() {
+    console.debug('Pager: ', this.state.selectedIndex)
     return (
       <View style={[styles.container,
       {
         width: this.state.width,
         height: this.state.height
       }]}>
+        {
+          this.state.tabs && (
+            <Tabs
+              width={this.state.width}
+              selectedIndex={this.state.selectedIndex}
+              tabs={this.state.tabs}
+            />
+          )
+        }
         <ScrollView
           onLayout={this._onLayout}
           ref={ref => this.scrollViewRef = ref}
